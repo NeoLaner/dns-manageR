@@ -1,0 +1,3 @@
+unstable_features = true
+comment_width = 80
+max_width = 60
