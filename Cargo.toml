@@ -7,9 +7,9 @@ edition = "2024"
 windows = { version = "0.61.3", features = [
    "Win32", # Essential top-level feature
     "Win32_NetworkManagement_IpHelper",
-    "Win32_NetworkManagement_Ndis",   # Required for GetAdaptersAddresses
-    "Win32_NetworkManagement_Dns",    # For SetInterfaceDnsSettings etc.
-    "Win32_Foundation",               # For common types like HRESULT, BOOL, etc.
+    "Win32_NetworkManagement_Ndis",    # Required for GetAdaptersAddresses
+    "Win32_NetworkManagement_Dns",     # For SetInterfaceDnsSettings etc.
+    "Win32_Foundation",                # For common types like HRESULT, BOOL, etc.
     "Win32_Networking_WinSock", 
 ]}
 

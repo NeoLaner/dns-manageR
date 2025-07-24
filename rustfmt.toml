@@ -1,3 +1,26 @@
+# Must be first
 unstable_features = true
-comment_width = 80
+
 max_width = 60
+tab_spaces = 4
+use_field_init_shorthand = true
+use_small_heuristics = "Max"
+imports_granularity = "Module"
+
+# Sort module items in groups
+reorder_modules = true
+
+# Format macro invocations
+format_macro_matchers = true
+
+# Format macro bodies
+format_macro_bodies = true
+
+# Indent with spaces
+hard_tabs = false
+
+# Format comments
+comment_width = 80
+
+# Group imports by prefix
+group_imports = "StdExternalCrate"
