@@ -81,7 +81,6 @@ fn get_adapter_ptr(
     result
 }
 
-
 struct AdapterData {
     name: String,
     adapter_address: IP_ADAPTER_ADDRESSES_LH,
@@ -121,8 +120,41 @@ fn get_adapter_data(
     adapter_data
 }
 
+fn get_adapters_data(
+    adapters_addresses_ptr: *mut IP_ADAPTER_ADDRESSES_LH,
+) -> Vec<AdapterData> {
+    let adapters_data: Vec<AdapterData> = vec![];
 
-fn main() -> windows::core::Result<()> {
+    unsafe {
+        // adapters_addresses_ptr is the raw pointer to the very beginning of the buffer
+        // that GetAdaptersAddresses filled
+        let mut current_adapter_addresses_ptr =
+            adapters_addresses_ptr;
+
+        while !current_adapter_addresses_ptr.is_null() {
+            let adapter_address: &IP_ADAPTER_ADDRESSES_LH =
+                &*current_adapter_addresses_ptr;
+
+            let adapter_data =
+                get_adapter_data(adapter_address);
+
+            println!(
+                "{}: , servers: {:#?}",
+                adapter_data.name,
+                adapter_data.dns_servers_addresses
+            );
+
+            current_adapter_addresses_ptr =
+                adapter_address.Next;
+        }
+    }
+
+    adapters_data
+}
+
+fn handle_get_adapters_data(
+    adapters_data: &mut Vec<AdapterData>,
+) -> windows::core::Result<()> {
     let mut size: u32 = 0;
     let result_of_cal_size =
         cal_buffer_size_for_adapters(&mut size);
@@ -146,26 +178,15 @@ fn main() -> windows::core::Result<()> {
         return Err(windows::core::Error::from_win32());
     }
 
-    unsafe {
-        // adapters_addresses_ptr is the raw pointer to the very beginning of the buffer
-        // that GetAdaptersAddresses filled
-        let mut current_adapter_addresses_ptr =
-            adapters_addresses_ptr;
-
-        while !current_adapter_addresses_ptr.is_null() {
-            let adapter_address: &IP_ADAPTER_ADDRESSES_LH =
-                &*current_adapter_addresses_ptr;
-
-            let adapter_data =
-                get_adapter_data(adapter_address);
-
-            println!("{}: , servers: {:#?}" , adapter_data.name , adapter_data.dns_servers_addresses);
-
-            current_adapter_addresses_ptr =
-                adapter_address.Next;
-        }
-    }
+    *adapters_data =
+        get_adapters_data(adapters_addresses_ptr);
 
     Ok(())
 }
 
+fn main() -> windows::core::Result<()> {
+    let mut adapters_data: Vec<AdapterData> = vec![];
+    handle_get_adapters_data(&mut adapters_data)?;
+
+    Ok(())
+}
