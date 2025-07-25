@@ -26,7 +26,6 @@ fn get_dns_servers(
                         sock_addr.sin_addr.S_un.S_addr,
                     ));
                     addresses.push(ip);
-                    println!("DNS Server: {}", ip);
                 }
             }
             dns_server = dns.Next;
@@ -82,6 +81,7 @@ fn get_adapter_ptr(
     result
 }
 
+
 struct AdapterData {
     name: String,
     adapter_address: IP_ADAPTER_ADDRESSES_LH,
@@ -101,6 +101,26 @@ impl AdapterData {
         }
     }
 }
+
+fn get_adapter_data(
+    adapter_address: &IP_ADAPTER_ADDRESSES_LH,
+) -> AdapterData {
+    // Get adapter name
+    let adapter_name = get_adapter_name(adapter_address);
+
+    // Get DNS servers
+    let dns_server_addresess =
+        get_dns_servers(adapter_address);
+
+    let adapter_data = AdapterData::new(
+        adapter_name,
+        *adapter_address,
+        dns_server_addresess,
+    );
+
+    adapter_data
+}
+
 
 fn main() -> windows::core::Result<()> {
     let mut size: u32 = 0;
@@ -139,6 +159,8 @@ fn main() -> windows::core::Result<()> {
             let adapter_data =
                 get_adapter_data(adapter_address);
 
+            println!("{}: , servers: {:#?}" , adapter_data.name , adapter_data.dns_servers_addresses);
+
             current_adapter_addresses_ptr =
                 adapter_address.Next;
         }
@@ -147,21 +169,3 @@ fn main() -> windows::core::Result<()> {
     Ok(())
 }
 
-fn get_adapter_data(
-    adapter_address: &IP_ADAPTER_ADDRESSES_LH,
-) -> AdapterData {
-    // Get adapter name
-    let adapter_name = get_adapter_name(adapter_address);
-
-    // Get DNS servers
-    let dns_server_addresess =
-        get_dns_servers(adapter_address);
-
-    let adapter_data = AdapterData::new(
-        adapter_name,
-        *adapter_address,
-        dns_server_addresess,
-    );
-
-    adapter_data
-}
